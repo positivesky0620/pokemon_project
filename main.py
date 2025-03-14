@@ -31,20 +31,23 @@ def check_and_fetch_data():
 
     # ✅ 첫 번째 체크: 존재하지 않는 파일만 리스트에 추가
     for file_path, file_name, fetch_function in files_to_check:
-        if not os.path.exists(file_path):  # ✅ 상대 경로로 파일 확인
+        if not os.path.exists(file_path):  # ✅ data 폴더에서 파일 확인
             print(f"⚠️ {file_name} 파일이 존재하지 않습니다. 데이터를 크롤링합니다...")
             missing_files.append((file_path, file_name, fetch_function))
 
     # ✅ 크롤링 실행 (필요한 경우만)
     for file_path, file_name, fetch_function in missing_files:
         fetch_function()  # ✅ 크롤링 실행
-        print(f"✅ {file_name} 크롤링 완료!")
+        if os.path.exists(file_path):  # ✅ 크롤링 후 다시 확인
+            print(f"✅ {file_name} 크롤링 완료! (파일 경로: {file_path})")
+        else:
+            print(f"⚠️ {file_name} 파일이 여전히 존재하지 않습니다. 오류 발생!")
 
     # ✅ 최종 확인
     all_files_exist = True
     for file_path, file_name, _ in files_to_check:
-        if not os.path.exists(file_path):  # ✅ 크롤링 후에도 없는 파일이 있으면 오류
-            print(f"⚠️ {file_name} 파일이 여전히 존재하지 않습니다. 오류가 발생한 것 같습니다!")
+        if not os.path.exists(file_path):  
+            print(f"⚠️ {file_name} 파일이 존재하지 않습니다!")
             all_files_exist = False
         else:
             print(f"✅ {file_name} 파일이 존재합니다.")

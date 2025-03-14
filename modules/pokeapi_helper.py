@@ -38,21 +38,27 @@ def get_type_effectiveness(type_name):
 
 
 def get_move_details(move_name):
-    """PokéAPI에서 특정 기술의 정보를 가져오고, 한글 이름으로 변환"""
-    url = f"https://pokeapi.co/api/v2/move/{move_name.lower()}"
+    """PokéAPI에서 특정 기술의 정보를 가져오고, 한글 이름을 영어로 변환하여 조회"""
+
+    # ✅ 한글 기술명을 PokéAPI 요청용으로 변환 (하이픈 포함)
+    move_name_eng = translator.translate_move_name(move_name, for_pokeapi=True)
+
+    url = f"https://pokeapi.co/api/v2/move/{move_name_eng.lower()}"
     response = requests.get(url)
 
     if response.status_code == 200:
         data = response.json()
         move_name_kor = translator.translate_move_name(data["name"])  # ✅ 한글 변환 적용
+
         return {
-            "name": move_name_kor,  # ✅ 한글 이름으로 저장
-            "power": data["power"] if data["power"] is not None else 0,
+            "name": move_name_kor,
+            "power": data["power"] if data["power"] is not None else 0,  # ✅ None이면 0으로 설정
             "accuracy": data["accuracy"] if data["accuracy"] is not None else 100,
             "pp": data["pp"],
-            "type": translator.translate_type(data["type"]["name"]),  # ✅ 타입도 한글로 변환
-            "damage_class": data["damage_class"]["name"],  # 물리/특수/보조 구분
+            "type": translator.translate_type(data["type"]["name"]),
+            "damage_class": data["damage_class"]["name"],
             "effect": data["effect_entries"][0]["effect"] if data["effect_entries"] else "효과 없음"
         }
     else:
+        print(f"⚠️ '{move_name_eng}' 기술 정보를 PokéAPI에서 찾을 수 없습니다.")  # ✅ 오류 메시지 추가
         return {"error": "기술 정보를 찾을 수 없습니다."}

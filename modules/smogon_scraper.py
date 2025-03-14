@@ -91,8 +91,9 @@ def get_smogon_moves(pokemon_name):
                     move_name = move_link.text.strip()
 
                     # ✅ 중복되지 않도록 저장 & 한글 변환
-                    if move_name and move_name not in moves:
-                        moves.append(translator.translate_move_name(move_name))  
+                    if move_name and move_name.lower() not in moves:
+                        translated_move = translator.translate_move_name(move_name)  # ✅ 영어 → 한글 변환
+                        moves.append(translated_move)  # ✅ moves.csv에 없으면 영어 그대로 유지
 
                     if len(moves) >= 4:  # ✅ 최대 4개까지만 저장
                         break
